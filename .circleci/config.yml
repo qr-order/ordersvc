@@ -30,7 +30,9 @@ jobs:
           key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
           name: Run tests
-          command: pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
+          command: |
+            . venv/bin/activate
+            pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
