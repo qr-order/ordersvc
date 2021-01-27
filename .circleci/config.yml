@@ -5,7 +5,7 @@ orbs:
 
 jobs:
   build_and_test:
-    working_directory: /ordersvc
+    working_directory: ~/ordersvc
     docker:
       - image: python:3.9-alpine
     steps:
@@ -36,3 +36,9 @@ jobs:
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - build_and_test
