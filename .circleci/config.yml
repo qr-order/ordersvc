@@ -18,7 +18,7 @@ jobs:
             apk add bash bash-dev
             pip install --upgrade pip
             pip install --no-cache-dir -r requirements.txt
-      - parsist_to_workspace:
+      - persist_to_workspace:
           root: .
           paths:
             - .
@@ -38,7 +38,7 @@ jobs:
 
 workflows:
   version: 2.1
-  build_test-deploy:
+  build_and_test:
     jobs:
       - build
       - test:
