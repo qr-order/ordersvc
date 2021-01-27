@@ -17,17 +17,13 @@ jobs:
             apk add curl curl-dev
             apk add bash bash-dev
       - restore_cache:
-          keys:
-          - dependencies-{{ checksum "requirements.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - dependencies-
+          key: dependencies-{{ checksum "requirements.txt" }}
       - run:
           name: Package Setup
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install --upgrade pip
-            pip install --no-cache-dir -r requirements.txt
+            pip install -r requirements.txt
       - save_cache:
           paths:
             - ./venv
