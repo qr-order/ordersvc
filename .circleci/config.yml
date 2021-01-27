@@ -31,8 +31,6 @@ jobs:
       - run:
           name: Run tests
           command: pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
-  codecov:
-    steps:
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
@@ -42,6 +40,3 @@ workflows:
   test:
     jobs:
       - build_and_test
-      - codecov:
-          - requires:
-              build_and_test
