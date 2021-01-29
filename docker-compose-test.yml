@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  test:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/test
+    working_dir: /test
+    command: pytest -c tests/pytest.ini --flake8
