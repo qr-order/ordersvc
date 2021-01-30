@@ -33,24 +33,25 @@ jobs:
           command: |
             . venv/bin/activate
             pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
-      - codecov/upload:
-          file: 'coverage.xml'
-          token: $CODECOV_TOKEN
       - persist_to_workspace:
           root: .
           paths:
               - .
+  codecov:
+    steps:
+      - attach_workspace:
+          at: .
+      - codecov/upload:
+          file: 'coverage.xml'
+          token: $CODECOV_TOKEN
   publish:
     docker:
       - image: docker:18.09.0
     steps:
-      - checkout
-      - attach_workspace:
-          at: .
       - run:
           name: build docker image
           command: |
-            docker build -f Dockerfile.prod -t ordersvc:latest
+            docker build -f Dockerfile.prod -t ordersvc:latest .
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
             docker push ordersvc:latest
 
