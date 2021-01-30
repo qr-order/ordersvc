@@ -7,7 +7,7 @@ jobs:
   build_and_test:
     working_directory: ~/ordersvc
     docker:
-      - image: python:3.9-alpine
+      - image: $DOCKER_IMAGE_TAG
     steps:
       - checkout
       - run:
@@ -51,8 +51,8 @@ jobs:
           name: build docker image
           command: |
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
-            docker build -f Dockerfile.prod -t $DOCKERHUB_ID/ordersvc:latest .
-            docker push $DOCKERHUB_ID/ordersvc:latest
+            docker build -f Dockerfile.prod -t $DOCKER_IMAGE_TAG .
+            docker push $DOCKER_IMAGE_TAG
 
 workflows:
   version: 2
