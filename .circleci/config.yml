@@ -44,6 +44,8 @@ jobs:
     docker:
       - image: docker:18.09.0
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: build docker image
           command: |
