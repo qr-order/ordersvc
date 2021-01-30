@@ -61,4 +61,4 @@ workflows:
       - build_and_test
       - publish:
           requires:
-            - build
+            - build_and_test
