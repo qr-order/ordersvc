@@ -7,7 +7,10 @@ jobs:
   build_and_test:
     working_directory: ~/ordersvc
     docker:
-      - image: python:3.9-alpine
+      - image: armada55/ordersvc:latest
+        auth:
+          username: $DOCKERHUB_ID
+          password: $DOCKERHUB_TOKEN
     steps:
       - checkout
       - run:
