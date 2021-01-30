@@ -46,6 +46,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - setup_remote_docker
       - run:
           name: build docker image
           command: |
