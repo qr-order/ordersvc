@@ -47,12 +47,12 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      run:
-        name: build docker image
-        command: |
-          docker build -f Dockerfile.prod -t ordersvc:latest
-          echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
-          docker push ordersvc:latest
+      - run:
+          name: build docker image
+          command: |
+            docker build -f Dockerfile.prod -t ordersvc:latest
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
+            docker push ordersvc:latest
 
 workflows:
   version: 2
