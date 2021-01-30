@@ -51,7 +51,7 @@ jobs:
           name: build docker image
           command: |
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
-            docker build -f Dockerfile.prod -t ordersvc:latest .
+            docker build -f Dockerfile.prod -t $DOCKERHUB_ID/ordersvc:latest .
             docker push $DOCKERHUB_ID/ordersvc:latest
 
 workflows:
