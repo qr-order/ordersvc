@@ -7,10 +7,7 @@ jobs:
   build_and_test:
     working_directory: ~/ordersvc
     docker:
-      - image: armada55/ordersvc:latest
-        auth:
-          username: $DOCKERHUB_ID
-          password: $DOCKERHUB_TOKEN
+      - image: python:3.9-alpine
     steps:
       - checkout
       - run:
@@ -39,6 +36,12 @@ jobs:
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
+      - run:
+          name: Push docker image
+          command: |
+            docker build -f Dockerfile.prod -t ordersvc:latest
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
+            docker push ordersvc:latest
 
 workflows:
   version: 2
