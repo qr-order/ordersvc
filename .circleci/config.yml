@@ -64,7 +64,7 @@ jobs:
 
 workflows:
   version: 2
-  CI/CD:
+  ci-cd:
     jobs:
       - build_and_test
       - publish:
