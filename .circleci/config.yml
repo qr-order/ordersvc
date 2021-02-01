@@ -71,3 +71,6 @@ workflows:
       - publish:
           requires:
             - build_and_test
+      - deploy:
+          requires:
+            - publish
