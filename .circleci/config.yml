@@ -60,7 +60,7 @@ jobs:
       - run:
           name: deploy
           command: |
-            ssh ubuntu@ec2-3-34-190-105.ap-northeast-2.compute.amazonaws.com ./deploy.sh
+            ssh ubuntu@ec2-3-34-190-105.ap-northeast-2.compute.amazonaws.com bash ./deploy.sh
 
 workflows:
   version: 2
