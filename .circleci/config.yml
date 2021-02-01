@@ -53,6 +53,15 @@ jobs:
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
             docker build -f Dockerfile.prod -t $DOCKER_IMAGE_TAG .
             docker push $DOCKER_IMAGE_TAG
+  deploy:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: deploy
+          command: |
+            ssh ubuntu@ec2-3-34-190-105.ap-northeast-2.compute.amazonaws.com
+            echo "hello world!"
 
 workflows:
   version: 2
