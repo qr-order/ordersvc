@@ -64,12 +64,18 @@ jobs:
 
 workflows:
   version: 2
-  test:
+  CI/CD:
     jobs:
       - build_and_test
       - publish:
           requires:
             - build_and_test
+          filters:
+            branches:
+              only: master
       - deploy:
           requires:
             - publish
+          filters:
+            branches:
+              only: master
