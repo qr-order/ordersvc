@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.test
     ports:
-      - 8000:8000
+      - "8000:8000"
     volumes:
       - .:/test
     working_dir: /test
