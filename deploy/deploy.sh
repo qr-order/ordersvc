@@ -1,6 +1,13 @@
-../git checkout main
-../git pull
+cd ..
 
+eval "$(ssh-agent -s)"
+
+ssh-add ~/.ssh/id_rsa
+
+git checkout main
+git pull origin main
+
+cd deploy
 
 EXIST_BLUE=$(docker ps | grep ordersvc-blue)
 
@@ -28,7 +35,7 @@ fi
 EXIST_BLUE=$(docker ps | grep ordersvc-blue)
 EXIST_GREEN=$(docker ps | grep ordersvc-green)
 
-if [ -n "$EXIST_BLUE" && -n "$EXIST_GREEN"]; then
+if [ -n "$EXIST_BLUE" ] && [ -n "$EXIST_GREEN" ]; then
   echo Deploy Finish!!
 else
   echo Deploy Failed!!!
