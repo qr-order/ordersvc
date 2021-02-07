@@ -1,6 +1,7 @@
 ../git checkout main
 ../git pull
 
+
 EXIST_BLUE=$(docker ps | grep ordersvc-blue)
 
 echo Deploy blue...
