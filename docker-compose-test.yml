@@ -1,11 +1,12 @@
-version: '3.9'
+version: '3.8'
 
 services:
   test:
     build:
       context: .
+      dockerfile: Dockerfile.test
     ports:
-      - 8000:8000
+      - "8000:8000"
     volumes:
       - .:/test
     working_dir: /test

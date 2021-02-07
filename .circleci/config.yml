@@ -7,7 +7,7 @@ jobs:
   build_and_test:
     working_directory: ~/ordersvc
     docker:
-      - image: python:3.9-alpine
+      - image: $DOCKER_IMAGE_TAG
     steps:
       - checkout
       - run:
@@ -36,9 +36,46 @@ jobs:
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
+      - persist_to_workspace:
+          root: .
+          paths:
+              - .
+  publish:
+    docker:
+      - image: docker:18.09.0
+    steps:
+      - attach_workspace:
+          at: .
+      - setup_remote_docker
+      - run:
+          name: build docker image
+          command: |
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_ID" --password-stdin
+            docker build -f Dockerfile.prod -t $DOCKER_IMAGE_TAG .
+            docker push $DOCKER_IMAGE_TAG
+  deploy:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: deploy
+          command: |
+            ssh ubuntu@"$SERVER_ADDRESS" bash ./server/ordersvc/deploy/deploy.sh
 
 workflows:
   version: 2
-  test:
+  ci-cd:
     jobs:
       - build_and_test
+      - publish:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: main
+      - deploy:
+          requires:
+            - publish
+          filters:
+            branches:
+              only: main
