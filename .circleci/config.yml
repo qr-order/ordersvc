@@ -69,7 +69,7 @@ workflows:
       - test
       - publish:
           requires:
-            - build_and_test
+            - test
           filters:
             branches:
               only: main
