@@ -4,7 +4,7 @@ orbs:
   codecov: codecov/codecov@1.1.3
 
 jobs:
-  build_and_test:
+  test:
     working_directory: ~/ordersvc
     docker:
       - image: $DOCKER_IMAGE_TAG
@@ -32,7 +32,7 @@ jobs:
           name: Run tests
           command: |
             . venv/bin/activate
-            pytest . --cov=. --cov-report=xml:./coverage.xml -c app/src/tests/pytest.ini --flake8
+            pytest . --cov=. --cov-report=xml:./coverage.xml -c src/tests/pytest.ini --flake8
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
