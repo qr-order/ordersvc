@@ -10,4 +10,4 @@ services:
     volumes:
       - .:/test
     working_dir: /test
-    command: pytest -c tests/pytest.ini --flake8
+    command: pytest -c src/tests/pytest.ini --flake8
