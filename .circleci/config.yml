@@ -61,7 +61,7 @@ jobs:
       - run:
           name: deploy
           command: |
-            ssh ubuntu@"$SERVER_ADDRESS" bash ~/deploy.sh
+            ssh ubuntu@"$SERVER_ADDRESS" bash ./deploy.sh
 
 workflows:
   version: 2
