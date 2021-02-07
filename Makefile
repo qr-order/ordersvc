@@ -4,6 +4,6 @@ build:
 		docker-compose build
 		docker-compose -f docker-compose-test.yml build
 run:
-		docker-compose run app
+		docker-compose up
 test:
 		docker-compose -f docker-compose-test.yml run test

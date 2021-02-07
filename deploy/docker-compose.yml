@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   blue:
@@ -11,7 +11,9 @@ services:
     working_dir: /app
     networks:
       - backend
-    entrypoint: uvicorn main:app --workers 1 --host 0.0.0.0 --port 8081
+    entrypoint: >
+      sh -c "cd src &&
+             uvicorn main:app --workers 1 --host 0.0.0.0 --port 8081"
 
   green:
     image: armada55/ordersvc:latest
@@ -23,7 +25,9 @@ services:
     working_dir: /app
     networks:
       - backend
-    entrypoint: uvicorn main:app --workers 1 --host 0.0.0.0 --port 8082
+    entrypoint: >
+      sh -c "cd src &&
+             uvicorn main:app --workers 1 --host 0.0.0.0 --port 8082"
     
   proxy:
     image: nginx:latest

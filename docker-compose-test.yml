@@ -1,4 +1,5 @@
-version: '3.8'
+version: '3'
+
 
 services:
   test:
@@ -10,4 +11,6 @@ services:
     volumes:
       - .:/test
     working_dir: /test
-    command: pytest -c tests/pytest.ini --flake8
+    command: >
+      sh -c "cd src &&
+             pytest -c tests/pytest.ini --flake8"
