@@ -10,4 +10,6 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    entrypoint: uvicorn src.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    entrypoint: >
+      sh -c "cd src &&
+             uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000"

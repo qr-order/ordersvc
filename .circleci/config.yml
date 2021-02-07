@@ -32,7 +32,8 @@ jobs:
           name: Run tests
           command: |
             . venv/bin/activate
-            pytest . --cov=. --cov-report=xml:./coverage.xml -c src/tests/pytest.ini --flake8
+            cd src
+            pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
