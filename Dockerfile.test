@@ -6,6 +6,9 @@ WORKDIR /app
 
 COPY requirements.txt ./
 
+RUN apk update
+RUN apk add bash bash-dev
+
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY ./ ./

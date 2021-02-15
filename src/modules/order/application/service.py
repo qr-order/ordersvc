@@ -1,11 +1,23 @@
-from modules.order.application.event_broker import BaseEventBroker
-from modules.order.application.repository import BaseRepository
+from modules.order.domain.value_object import OrderStatus
+from modules.order.application.event_broker.producer import KafkaProducer
+from modules.order.application.unit_of_work import AbstractUnitOfWork
+from modules.order.domain.entity import Order as OrderEntity
 
 
 class OrderService:
+
+    @classmethod
     def make_order(
-            self,
-            repository: BaseRepository,
-            event_broker: BaseEventBroker
+            cls,
+            order: OrderEntity,
+            unit_of_work: AbstractUnitOfWork,
+            producer: KafkaProducer
     ):
-        pass
+        with unit_of_work as repo_uow:
+            order.create()
+            repo_uow.batches.add(order)
+            with producer.transaction() as produce_uow:
+                produce_uow.produce_order(order)
+                repo_uow.commit()
+
+        return True

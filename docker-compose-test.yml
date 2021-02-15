@@ -10,7 +10,35 @@ services:
       - "8000:8000"
     volumes:
       - .:/test
+    environment:
+      - DB_NAME=ordersvc
+      - DB_PORT=3306
+      - DB_USER=test
+      - DB_PASSWORD=test_password
+      - DB_HOST=testmysqldb
     working_dir: /test
-    command: >
+    entrypoint: >
       sh -c "cd src &&
+             tests/wait-for-it.sh testmysqldb:3306 --
              pytest -c tests/pytest.ini --flake8"
+    depends_on:
+      - testmysqldb
+
+  testmysqldb:
+    image: mysql:8
+    command: mysqld
+    volumes:
+      - mysqldata:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=ordersvc
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test_password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    healthcheck:
+      test: "mysqladmin ping -h localhost"
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mysqldata:

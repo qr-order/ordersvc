@@ -9,7 +9,34 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+    environment:
+      - DB_NAME=ordersvc_local
+      - DB_PORT=3306
+      - DB_USER=local
+      - DB_PASSWORD=local_password
+      - DB_HOST=mysqldb
     working_dir: /app
     entrypoint: >
       sh -c "cd src &&
              uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000"
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql:8
+    command: mysqld
+    volumes:
+      - mysqldata:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=ordersvc_local
+      - MYSQL_USER=local
+      - MYSQL_PASSWORD=local_password
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    healthcheck:
+      test: "mysqladmin ping -h localhost"
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mysqldata:
