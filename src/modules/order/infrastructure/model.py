@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, ARRAY, DateTime, Enum
 from sqlalchemy.dialects.mysql import INTEGER
 
-from database.mysql import Base
+from database.postgresql import Base
 from modules.order.domain.value_object import OrderStatus
 
 

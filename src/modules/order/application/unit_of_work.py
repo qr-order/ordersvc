@@ -17,7 +17,7 @@ class AbstractUnitOfWork(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def rollback(self):
+    def rollback(self, *args):
         raise NotImplementedError
 
 
@@ -31,11 +31,11 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         return super(SqlAlchemyUnitOfWork, self).__enter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        super(SqlAlchemyUnitOfWork, self).__exit__(exc_type, exc_val, exc_tb)
         self.session.close()
 
     def commit(self):
         self.session.commit()
 
-    def rollback(self):
+    def rollback(self, model):
         self.session.rollback()
+        self.batches.rollback_committed_data(model)

@@ -1,23 +1,31 @@
-from modules.order.domain.value_object import OrderStatus
+from kafka.errors import KafkaError
+
 from modules.order.application.event_broker.producer import KafkaProducer
 from modules.order.application.unit_of_work import AbstractUnitOfWork
 from modules.order.domain.entity import Order as OrderEntity
+from modules.order.interface.model import Order as OrderDTO
+from modules.order.infrastructure.model import Order as OrderDAO
 
 
 class OrderService:
 
     @classmethod
-    def make_order(
+    async def make_order(
             cls,
-            order: OrderEntity,
+            order: OrderDTO,
             unit_of_work: AbstractUnitOfWork,
             producer: KafkaProducer
     ):
+        entity = OrderEntity(**order.dict())
         with unit_of_work as repo_uow:
-            order.create()
-            repo_uow.batches.add(order)
-            with producer.transaction() as produce_uow:
-                produce_uow.produce_order(order)
-                repo_uow.commit()
+            entity.create()
+            repo_uow.batches.add(OrderDTO.entity_to_orm(entity))
+            repo_uow.commit()
 
-        return True
+            try:
+                await producer.produce_order(order)
+            except KafkaError as e:
+                repo_uow.rollback(OrderDAO)
+                raise e
+
+        return entity

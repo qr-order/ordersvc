@@ -31,7 +31,7 @@ def get_entity_test_case():
         test(
             case_name='',
             order=dict(
-                order_id=uuid4(),
+                id=uuid4(),
                 customer_phone_number='01091207304',
                 store_id=uuid4(),
                 item_ids=[uuid4() for _ in range(5)],
@@ -45,7 +45,7 @@ def get_entity_test_case():
         test(
             case_name='',
             order=dict(
-                order_id=uuid4(),
+                id=uuid4(),
                 customer_phone_number='01091207304',
                 store_id=uuid4(),
                 item_ids=[uuid4() for _ in range(5)],

@@ -11,34 +11,51 @@ services:
     volumes:
       - .:/test
     environment:
-      - DB_NAME=ordersvc
-      - DB_PORT=3306
+      - DB_NAME=test
+      - DB_PORT=5432
       - DB_USER=test
       - DB_PASSWORD=test_password
-      - DB_HOST=testmysqldb
+      - DB_HOST=testpostgresql
+      - KAFKA_HOST=testkafka
+      - KAFKA_PORT=9092
+      - PYTHONDONTWRITEBYTECODE=1
     working_dir: /test
     entrypoint: >
       sh -c "cd src &&
-             tests/wait-for-it.sh testmysqldb:3306 --
-             pytest -c tests/pytest.ini --flake8"
+             tests/wait-for-it.sh --timeout=0 testpostgresql:5432 &&
+             tests/wait-for-it.sh --timeout=0 testkafka:9092 &&
+             pytest -c tests/pytest.ini --flake8 -rs"
     depends_on:
-      - testmysqldb
+      - testpostgresql
+      - testkafka
 
-  testmysqldb:
-    image: mysql:8
-    command: mysqld
-    volumes:
-      - mysqldata:/var/lib/mysql
+  testpostgresql:
+    image: postgres:9.6
     environment:
-      - MYSQL_DATABASE=ordersvc
-      - MYSQL_USER=test
-      - MYSQL_PASSWORD=test_password
-      - MYSQL_ALLOW_EMPTY_PASSWORD=1
-    healthcheck:
-      test: "mysqladmin ping -h localhost"
-      interval: 1s
-      timeout: 3s
-      retries: 10
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test_password
+    ports:
+      - "5432"
+
+  testzookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  testkafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      DOCKER_API_VERSION: 1.22
+      KAFKA_ADVERTISED_HOST_NAME: testkafka
+      KAFKA_ADVERTISED_PORT: "9092"
+      KAFKA_CREATE_TOPICS: "order:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: testzookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - testzookeeper
 
 volumes:
   mysqldata:

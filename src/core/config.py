@@ -1,16 +1,22 @@
 import os
 
+
+#############################################
+# Kafka
+#############################################
 KAFKA_TOPIC = 'order'
-KAFKA_BOOTSTRAP_SERVERS = 'localhost:9092'
+KAFKA_HOST = os.environ.get("KAFKA_HOST")
+KAFKA_PORT = os.environ.get("KAFKA_PORT")
+KAFKA_BOOTSTRAP_SERVERS = f'{KAFKA_HOST}:{KAFKA_PORT}'
 
 
 #############################################
-# MySQL
+# Postgresql
 #############################################
-def get_mysql_url():
+def get_postgres_url():
     host = os.environ.get('DB_HOST')
-    port = os.environ.get('DB_PORT', 3306)
+    port = os.environ.get('DB_PORT', 5432)
     user = os.environ.get('DB_USER')
     password = os.environ.get('DB_PASSWORD')
     name = os.environ.get('DB_NAME')
-    return f'mysql+mysqlconnector://{user}:{password}@{host}:{port}/{name}'
+    return f'postgresql://{user}:{password}@{host}:{port}/{name}'

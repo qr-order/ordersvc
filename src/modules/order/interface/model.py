@@ -1,44 +1,59 @@
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-import arrow
-from pydantic.main import BaseModel
+import phonenumbers
+from humps import camel
+from pydantic import validator, ValidationError
 
+from pydantic.main import BaseModel
 from modules.order.domain.entity import Order as OrderEntity
-from modules.order.domain.value_object import OrderStatus
+from modules.order.infrastructure.model import Order as OrderDAO
+
+
+def to_camel(string):
+    return camel.case(string)
 
 
 class Order(BaseModel):
-    id: Optional[str] = None
-    customerPhoneNumber: str
-    storeId: str
-    itemIds: List[str]
+    id: Optional[UUID] = None
+    customer_phone_number: str
+    store_id: UUID
+    item_ids: List[UUID]
     amount: int
-    orderDate: Optional[str] = None
-    orderStatus: Optional[int] = None
+    order_date: Optional[datetime] = None
+    order_status: Optional[int] = None
 
-    def to_entity(self):
-        entity = OrderEntity(
-            order_id=UUID(self.id) if self.id is not None else None,
-            customer_phone_number=self.customerPhoneNumber,
-            store_id=UUID(self.storeId),
-            item_ids=[UUID(item) for item in self.itemIds],
-            amount=self.amount,
-            order_date=arrow.get(self.orderDate),
-            order_status=OrderStatus(self.orderStatus)
-        )
-        return entity
+    class Config:
+        alias_generator = to_camel
+        allow_population_by_field_name = True
+        orm_mode = True
 
     @classmethod
-    def serialize(cls, order: OrderEntity):
-        return Order(
-            order_id=str(order.id),
+    def entity_to_orm(cls, order: OrderEntity):
+        return OrderDAO(
+            id=str(order.id),
             customer_phone_number=order.customer_phone_number,
-            storeId=str(order.store_id),
-            itemIds=[str(item) for item in order.item_ids],
+            store_id=str(order.store_id),
+            item_ids=[str(item) for item in order.item_ids],
             amount=order.amount,
-            orderDate=str(order.order_date),
-            orderStatus=int(order.order_status)
+            order_date=str(order.order_date),
+            order_status=int(order.order_status)
         )
 
+    @validator('customer_phone_number')
+    def validate_kr_phone_number(cls, pn):
+        try:
+            parsed_pn = phonenumbers.parse(pn, 'KR')
+            if not phonenumbers.is_valid_number(parsed_pn):
+                raise ValueError('invalid phone number')
+        except Exception as e:
+            raise ValidationError(e)
 
+        return pn
+
+    @validator('amount')
+    def amount_must_be_positive_number(cls, num):
+        if num < 0:
+            raise ValidationError('amount must be positive number')
+        return num
