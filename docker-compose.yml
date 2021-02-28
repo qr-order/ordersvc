@@ -10,33 +10,51 @@ services:
     volumes:
       - .:/app
     environment:
-      - DB_NAME=ordersvc_local
-      - DB_PORT=3306
+      - DB_NAME=local
+      - DB_PORT=5432
       - DB_USER=local
       - DB_PASSWORD=local_password
-      - DB_HOST=mysqldb
+      - DB_HOST=postgresql
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
+      - PYTHONDONTWRITEBYTECODE=1
     working_dir: /app
     entrypoint: >
       sh -c "cd src &&
+             tests/wait-for-it.sh --timeout=0 postgresql:5432 &&
+             tests/wait-for-it.sh --timeout=0 kafka:9092 &&
              uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000"
     depends_on:
-      - mysqldb
+      - postgresql
+      - kafka
 
-  mysqldb:
-    image: mysql:8
-    command: mysqld
-    volumes:
-      - mysqldata:/var/lib/mysql
+  postgresql:
+    image: postgres:9.6
     environment:
-      - MYSQL_DATABASE=ordersvc_local
-      - MYSQL_USER=local
-      - MYSQL_PASSWORD=local_password
-      - MYSQL_ALLOW_EMPTY_PASSWORD=1
-    healthcheck:
-      test: "mysqladmin ping -h localhost"
-      interval: 1s
-      timeout: 3s
-      retries: 10
+      - POSTGRES_USER=local
+      - POSTGRES_PASSWORD=local_password
+    ports:
+      - "5432"
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      DOCKER_API_VERSION: 1.22
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: "9092"
+      KAFKA_CREATE_TOPICS: "order:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
 
 volumes:
   mysqldata:
