@@ -29,8 +29,13 @@ jobs:
       - run:
           name: Install postgresql and run
           command: |
+            wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
             apk add postgresql-client
+            dockerize -wait tcp://localhost:5432 -timeout 1m
             psql -U circleci -h localhost -p 5432 -c 'create extension ltree'
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
       - checkout
       - restore_cache:
           key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
