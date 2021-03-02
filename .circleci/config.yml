@@ -28,8 +28,6 @@ jobs:
             apk add bash bash-dev
             apk add postgresql-dev gcc python3-dev musl-dev
             apk add docker
-            curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
       - restore_cache:
           key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
@@ -37,6 +35,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            pip install docker-compose
             pip install -r requirements.txt
       - save_cache:
           paths:
