@@ -28,8 +28,6 @@ jobs:
             apk add bash bash-dev
             apk add postgresql-dev gcc python3-dev musl-dev
             apk add docker
-      - restore_cache:
-          key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
           name: Package Setup
           command: |
@@ -38,10 +36,6 @@ jobs:
             pip install --upgrade pip
             pip install docker-compose
             pip install -r requirements.txt
-      - save_cache:
-          paths:
-            - ./venv
-          key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
           name: Run tests
           command: |
