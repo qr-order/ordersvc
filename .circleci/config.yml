@@ -8,14 +8,31 @@ jobs:
     working_directory: ~/ordersvc
     docker:
       - image: $DOCKER_IMAGE_TAG
+      - image: circleci/postgres:9.6.2-alpine
+        environment:
+          POSTGRES_USER: circleci
+          POSTGRES_PASSWORD: test_password
+    environment:
+      DB_NAME: circleci
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: circleci
+      DB_PASSWORD: test_password
     steps:
-      - checkout
       - run:
           name: Install curl and bash
           command: |
             apk update
             apk add curl curl-dev
             apk add bash bash-dev
+            apk add postgresql-dev gcc python3-dev musl-dev
+      - run:
+          name: Install postgresql and run
+          command: |
+            apk add postgresql-client
+            dockerize -wait tcp://localhost:5432 -timeout 1m
+            psql -U circleci -h localhost -p 5432 -c 'create extension ltree'
+      - checkout
       - restore_cache:
           key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
