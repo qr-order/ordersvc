@@ -8,6 +8,16 @@ jobs:
     working_directory: ~/ordersvc
     docker:
       - image: $DOCKER_IMAGE_TAG
+      - image: circleci/postgres:9.6.2-alpine
+        environment:
+          POSTGRES_USER: circleci
+          POSTGRES_PASSWORD: test_password
+    environment:
+      DB_NAME: circleci
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: circleci
+      DB_PASSWORD: test_password
     steps:
       - checkout
       - run:
@@ -16,24 +26,22 @@ jobs:
             apk update
             apk add curl curl-dev
             apk add bash bash-dev
-      - restore_cache:
-          key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
+            apk add postgresql-dev gcc python3-dev musl-dev
+            apk add libffi-dev
+            apk add docker
       - run:
           name: Package Setup
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install -r requirements.txt
-      - save_cache:
-          paths:
-            - ./venv
-          key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
+            pip install --upgrade pip
+            pip install docker-compose
       - run:
           name: Run tests
           command: |
             . venv/bin/activate
-            cd src
-            pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
+            docker-compose -f docker-compose-test.yml build
+            docker-compose -f docker-compose-test.yml run test --rm
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
