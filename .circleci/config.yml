@@ -27,6 +27,7 @@ jobs:
             apk add curl curl-dev
             apk add bash bash-dev
             apk add postgresql-dev gcc python3-dev musl-dev
+            apk add libffi-dev
             apk add docker
       - run:
           name: Package Setup
