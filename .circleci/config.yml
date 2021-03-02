@@ -36,7 +36,6 @@ jobs:
             . venv/bin/activate
             pip install --upgrade pip
             pip install docker-compose
-            pip install -r requirements.txt
       - run:
           name: Run tests
           command: |
