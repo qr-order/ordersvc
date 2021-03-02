@@ -24,7 +24,7 @@ services:
       sh -c "cd src &&
              tests/wait-for-it.sh --timeout=0 testpostgresql:5432 &&
              tests/wait-for-it.sh --timeout=0 testkafka:9092 &&
-             pytest -c tests/pytest.ini --flake8 -rs"
+             pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
     depends_on:
       - testpostgresql
       - testkafka
