@@ -19,6 +19,7 @@ jobs:
       DB_USER: circleci
       DB_PASSWORD: test_password
     steps:
+      - checkout
       - run:
           name: Install curl and bash
           command: |
@@ -26,17 +27,7 @@ jobs:
             apk add curl curl-dev
             apk add bash bash-dev
             apk add postgresql-dev gcc python3-dev musl-dev
-      - run:
-          name: Install postgresql and run
-          command: |
-            wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-            sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-            apk add postgresql-client
-            dockerize -wait tcp://localhost:5432 -timeout 1m
-            psql -U circleci -h localhost -p 5432 -c 'create extension ltree'
-          environment:
-            DOCKERIZE_VERSION: v0.3.0
-      - checkout
+            apk add docker
       - restore_cache:
           key: dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
@@ -53,8 +44,8 @@ jobs:
           name: Run tests
           command: |
             . venv/bin/activate
-            cd src
-            pytest . --cov=. --cov-report=xml:./coverage.xml -c tests/pytest.ini --flake8
+            make build
+            make test
       - codecov/upload:
           file: 'coverage.xml'
           token: $CODECOV_TOKEN
