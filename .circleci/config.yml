@@ -35,7 +35,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip3 install --upgrate pip3
+            pip3 install --upgrade pip3
             pip3 install docker-compose
             pip3 install -r requirements.txt
       - save_cache:
