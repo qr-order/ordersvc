@@ -30,7 +30,6 @@ jobs:
           name: Install postgresql and run
           command: |
             apk add postgresql-client
-            dockerize -wait tcp://localhost:5432 -timeout 1m
             psql -U circleci -h localhost -p 5432 -c 'create extension ltree'
       - checkout
       - restore_cache:
